@@ -10,24 +10,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clonar repo_01 (dscommerce)
-        uses: actions/checkout@v3
+      - name: Clonar repo_02 (DESAFIO-01)
+        run: |
+          git clone https://github.com/Cleiltoncrb/DESAFIO-01.git
+          cd DESAFIO-01
 
       - name: Obter última mensagem do commit
         id: last_commit
         run: echo "message=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
 
-      - name: Clonar repo_02 (DESAFIO-01)
+      - name: Adicionar commit ao README.md
         run: |
-          git clone https://github.com/Cleiltoncrb/DESAFIO-01.git
           cd DESAFIO-01
           
-          echo "## Histórico de Commits" > README.md
-          echo "$(date) - ${GITHUB_ACTOR}: ${message}" >> README.md
+          # Criar arquivo README.md se não existir
+          touch README.md
           
+          # Adicionar nova linha ao final do arquivo
+          echo "- $(date '+%Y-%m-%d %H:%M:%S') | ${GITHUB_ACTOR}: ${message}" >> README.md
+          
+          # Configurar usuário do Git
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
+
+          # Commit e push das alterações
           git add README.md
           git commit -m "Atualização automática: ${message}"
           git push https://${{ secrets.GH_PAT }}@github.com/Cleiltoncrb/DESAFIO-01.git main
-# - mais um teste
