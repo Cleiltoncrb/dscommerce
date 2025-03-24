@@ -1,0 +1,29 @@
+stages:
+  - update_readme
+
+update_readme:
+  stage: update_readme
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache git
+  script:
+    - echo "Obtendo última mensagem do commit..."
+    - export MESSAGE=$(git log -1 --pretty=%B)
+
+    - echo "Clonando repo_02..."
+    - git clone https://oauth2:${GITLAB_PAT}@gitlab.desenvolvimento.ccarj.intraer/pessoal/sigpes-ng/promocoes-fe.git
+    - cd promocoes-fe
+
+    - echo "Atualizando README.md..."
+    - touch README.md
+    - echo "- $(date '+%Y-%m-%d %H:%M:%S') | ${CI_COMMIT_AUTHOR}: ${MESSAGE}" >> README.md
+
+    - git config --global user.email "ci@gitlab.com"
+    - git config --global user.name "GitLab CI"
+
+    - echo "Comitando e enviando atualização..."
+    - git add README.md
+    - git commit -m "Atualização automática: ${MESSAGE}"
+    - git push https://oauth2:${GITLAB_PAT}@gitlab.desenvolvimento.ccarj.intraer/pessoal/sigpes-ng/promocoes-fe.git main
+  only:
+    - main  # Executa apenas quando há commit na branch principal
